@@ -1,29 +1,25 @@
 import psycopg2
 
 #-----------------------------------------------------создаем таблицу----------------------
-with psycopg2.connect(database="netology_db", user="postgres", password="postgres") as conn:
-    with conn.cursor() as cur:
-        cur.execute("""
+def create_db(conn):
+    conn.cursor() as cur:
+    cur.execute("""
         CREATE TABLE IF NOT EXISTS phone_user(
             id SERIAL PRIMARY KEY,
             email_user VARCHAR(40) UNIQUE NOT NULL,
-            phone_user INTEGER 
-        );
-        """)
-        cur.execute("""
+        phone_user INTEGER)""")
+    cur.execute("""
         CREATE TABLE IF NOT EXISTS users(
             id SERIAL PRIMARY KEY,
             name TEXT (40) NOT NULL,
             subname TEXT (40) NOT NULL,
-            email_user VARCHAR(40) UNIQUE NOT NULL
-        );
-        """)
-        conn.commit()  # фиксируем в БД        
-        print(f'[INFO] Table created successfully')
+            email_user VARCHAR(40) UNIQUE NOT NULL)""")
+    conn.commit()  # фиксируем в БД        
+    print(f'[INFO] Table created successfully')
 
 
 #-----------------------------------------------------наполняем таблицу----------------------
-with psycopg2.connect(database="netology_db", user="postgres", password="postgres") as conn:
+def add_client(conn, name, subname, email, phones=None):
     with conn.cursor() as cur:
         cur.execute("""
         INSERT INTO users(name) VALUES('Spaider') RETURNING id;
@@ -78,21 +74,7 @@ with psycopg2.connect(database="netology_db", user="postgres", password="postgre
 #---------------------------------------------------найти клиента по его данным: имени, фамилии, email или телефону
 with psycopg2.connect(database="netology_db", user="postgres", password="postgres") as conn:
     with conn.cursor() as cur:
-        cur.execute("""
-         cur.execute("""
-        DELETE FROM users WHERE id=%s;
-        """, (1,))
-        cur.execute("""
-        SELECT * FROM users;
-        """)
+        cur.execute("""DELETE FROM users WHERE id=%s;""", (1,))
+        cur.execute("""SELECT * FROM users""")
         print(cur.fetchall())  # запрос данных автоматически зафиксирует изменения
-
-
-
-
-except Exception as _ex:
-    print('[info] Error while working with PostgreSQL', _ex)
-finally:
-    if connection:
-        connection.close()
-        print('[info] Error while working with PostgreSQL')
+  
