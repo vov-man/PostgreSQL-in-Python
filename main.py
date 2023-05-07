@@ -1,106 +1,63 @@
-import psycopg2
+import  psycopg2
+from config import host, user, password, bd_name
 
-#-----------------------------------------------------создаем таблицу----------------------
 def create_db(conn):
     with conn.cursor() as cur:
         cur.execute("""
-            CREATE TABLE IF NOT EXISTS phone_user(
-            id SERIAL PRIMARY KEY,
-            email_user VARCHAR(40) UNIQUE NOT NULL,
-            phone INTEGER)""")
+            CREATE TABLE IF NOT EXISTS username (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(25) UNIQUE,
+                surname varchar(25) NOT NULL,
+                email varchar(30) NOT NULL
+            );""")
         cur.execute("""
-            CREATE TABLE IF NOT EXISTS users(
-            id SERIAL PRIMARY KEY,
-            name TEXT (40) NOT NULL,
-            subname TEXT (40) NOT NULL,
-            email_user VARCHAR(40) UNIQUE NOT NULL)""")
-        conn.commit()  
-    return cur.fetchone()[0]   
+            CREATE TABLE IF NOT EXISTS phone (
+                id SERIAL PRIMARY KEY,
+                phon INTEGER,
+                fk_phone INTEGER NOT NULL REFERENCES username(id)
+            );""")
+    conn.commit()    
+    return cur.fetchone()[0]
 
-#-----------------------------------------------------наполняем таблицу----------------------
-def add_client(conn, name, subname, email, phone=None):
+def add_client(conn, name, subname, email, phon=None):
     with conn.cursor() as cur:
-        cur.execute("""INSERT INTO users(name) VALUES('Spaider') RETURNING id""")
-        cur.execute("""INSERT INTO users(subname) VALUES('Man') RETURNING id""")
-        cur.execute("""INSERT INTO users(email_esers) VALUES('SpaiderMan@netodology.ru') RETURNING id""")
+        cur.execute(f"INSERT INTO username (name, surname, email) VALUES ('{first_name}', '{last_name}', '{email}') RETURNING id;")
+        cur.execute(f"INSERT INTO phone (phon) VALUES('{phones}');")
+    conn.commit()
     return cur.fetchone()[0]  
 
-#-----------------------------------------------------добовляем телефон пользвателю----------
-def add_phone(conn, users_id, phone_users):
-    with conn.cursor() as cur:
-        cur.execute("""
-            INSERT INTO phone_users(email_user, phone, users_id) VALUES(SpaiderMan@netodology.ru, '02', 1);
-            """)
-        conn.commit()  
-    return cur.fetchone()[0]  
 
-#-----------------------------------------------------добовляем данные о клиенте-------------
-def change_client(conn, user_id, name=None, subname=None, email_users=None, phones_users=None):
-    with conn.cursor() as cur:
-        cur.execute("""
-            INSERT INTO users(1, name, subname, email_users, phone) VALUES('Vladimir', 'Putin', 'superman@111111.ru', 1);
-            """)
-        conn.commit()  
-    return cur.fetchone()[0]  
-
-#-----------------------------------------------------удалить телефон для существующего клиента------
-def delete_phone(conn, users_id, phone_users):
-    with conn.cursor() as cur:        
-        cur.execute("""
-            DELETE FROM phone WHERE id=%spaiderman;
-            """, (1,))
-        cur.execute("""
-        SELECT * FROM phone_user;
-        """)
-    return cur.fetchone()[0]  
-
-#--------------------------------------------------- удалить существующего клиента.--------------
-def delete_client(conn, users_id):
-    with conn.cursor() as cur:
-        cur.execute("""
-            DELETE FROM users WHERE id=%spaiderman;
-            """, (1,))
-        cur.execute("""
-        SELECT * FROM users;
-        """)
-    return cur.fetchone()[0]  
-
-#---------------------------------------------------найти клиента по его данным: имени, фамилии, email или телефону
-def find_client(conn, name=None, subname=None, email_user=None, phone_user=None):
-    with conn.cursor() as cur:
-        cur.execute("""
-        SELECT id FROM users WHERE name=%s, subname=%s, emai_user=%s;
-        """, ("Man", "Spaider", "SpaiderMan@netodology.ru" ))  
-        cur.execute("""
-        SELECT id FROM phone_users WHERE phone=%s;
-        """, ("02" ))  
-    return cur.fetchone()[0]  
-
-#with psycopg2.connect(database="clients_db", user="postgres", password="postgres") as conn:
-
-print('Возможные команды: 1, 2, 3, 4, 5, 6, 7')
-comand = input('Введите название команды ')
+with psycopg2.connect(host=host, database=bd_name, user=user, password=password)  as conn:
+    #print('Возможные команды: 1, 2, 3, 4, 5, 6, 7')
+    comand = input('Введите название команды ')
  
-if comand == '1':
-    create_db()
+    if comand == '1':
+        create_db(conn)
     
-elif comand == '2':
-    add_client()
+    elif comand == '2':
+        first_name = input("Введите имя: ")
+        last_name = input("Введите фамилию: ")
+        email = input("Введите email: ")
+        phones = input("Введите номер телефона: ")
+        add_client(conn, first_name, last_name, email, phones)
     
-elif comand == '3':
-    add_phone()
+    elif comand == '3':
+        add_phone()
+            
+    elif comand == '4':
+        change_client()
+
+    elif comand == '5':
+        delete_phone()
+
+    elif comand == '6':
+        delete_client()
+
+    elif comand == '7':
+        print(find_client())
+
+
+    
         
-elif comand == '4':
-    change_client()
-
-elif comand == '5':
-    delete_phone()
-
-elif comand == '6':
-    delete_client()
-
-elif comand == '7':
-    print(find_client())
-
 
 conn.close()
