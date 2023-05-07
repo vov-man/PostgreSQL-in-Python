@@ -76,7 +76,7 @@ def find_client(conn, name=None, subname=None, email_user=None, phone_user=None)
         """, ("02" ))  
     return cur.fetchone()[0]  
 
-with psycopg2.connect(database="clients_db", user="postgres", password="postgres") as conn:
+#with psycopg2.connect(database="clients_db", user="postgres", password="postgres") as conn:
 
 print('Возможные команды: 1, 2, 3, 4, 5, 6, 7')
 comand = input('Введите название команды ')
