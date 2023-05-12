@@ -91,26 +91,24 @@ def delete_client(conn, last_name):
 def find_client(conn, first_name, last_name, email, phone):  # поиск пока не победил 
     with conn.cursor() as cur:
         cur.execute("""
-                    SELECT id FROM username WHERE surname=%s;
-                    """, (last_name,))
-        def get_newname_id(cur, last_name: str) -> int:
-            cur.execute("""
             SELECT id FROM username WHERE name=%s;
-            """, (last_name,))
-            return cur.fetchone()[0]
-        lastname_id = get_newname_id(cur, last_name)
+                 """, (first_name, ))
+        search_name = (cur.fetchone())
         cur.execute("""
-        UPDATE username SET name=%s, surname=%s, email=%s WHERE id=%s;
-        """, (first_name, newname, email, lastname_id))
+            SELECT id FROM username WHERE surname=%s;
+                 """, (last_name, ))
+        search_surname = (cur.fetchone())
         cur.execute("""
-        UPDATE phone SET phon=%s WHERE fk_phone=%s;
-        """, (phones, lastname_id))
+            SELECT id FROM username WHERE email=%s;
+                 """, (email, ))
+        search_email = (cur.fetchone())
+        cur.execute("""
+            SELECT id FROM phone WHERE phon=%s;
+                 """, (phone, ))
+        search_email = (cur.fetchone())
+    
+ #SELECT * FROM username u JOIN phone p ON u.id=fk_phone.id WHERE name=%s or surname=%s or email=%s or phon=%s;      
         
-        conn.commit()
-        cur.execute("""
-        SELECT * FROM course;
-        """)
-        print('fetchall', cur.fetchall())
 #Функция, позволяющая найти клиента по его данным: имени, фамилии, email или телефону. 
 
 
@@ -158,8 +156,10 @@ with psycopg2.connect(host=host, database=bd_name, user=user, password=password)
         last_name = input("Введите фамилию: ")
         email = input("Введите email: ")
         phone = int(input("Введите телефон: "))
-
-        print(find_client(conn, first_name, last_name, email, phone))
+        
+        
+        find_client(conn, first_name, last_name, email, phone)
+        
 
                                                                                                                                                                 
     
