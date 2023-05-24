@@ -30,20 +30,20 @@ def add_client(conn, name, surname, email):
 def add_phone(conn, fk_phone, phone):
     with conn.cursor() as cur:
         cur.execute("""
-                 SELECT id FROM username WHERE surname=%s;
-                 """, (surname,))
+            SELECT id FROM username WHERE surname=%s;
+            """, (surname,))
         fk_phone = cur.fetchone()
         cur.execute("""
-                INSERT INTO phone(phon, fk_phone) VALUES(%s, %s);
-                """, (phone, fk_phone))
+            INSERT INTO phone(phon, fk_phone) VALUES(%s, %s);
+            """, (phone, fk_phone))
         conn.commit() 
 #Функция, позволяющая добавить телефон для существующего клиента.
 
 def change_client(conn, client_id, first_name, last_name, email, phones, newname):
     with conn.cursor() as cur:
         cur.execute("""
-                    SELECT id FROM username WHERE surname=%s;
-                    """, (last_name,))
+            SELECT id FROM username WHERE surname=%s;
+            """, (last_name,))
         def get_newname_id(cur, last_name: str) -> int:
             cur.execute("""
             SELECT id FROM username WHERE name=%s;
@@ -51,11 +51,11 @@ def change_client(conn, client_id, first_name, last_name, email, phones, newname
             return cur.fetchone()[0]
         lastname_id = get_newname_id(cur, last_name)
         cur.execute("""
-        UPDATE username SET name=%s, surname=%s, email=%s WHERE id=%s;
-        """, (first_name, newname, email, lastname_id))
+            UPDATE username SET name=%s, surname=%s, email=%s WHERE id=%s;
+            """, (first_name, newname, email, lastname_id))
         cur.execute("""
-        UPDATE phone SET phon=%s WHERE fk_phone=%s;
-        """, (phones, lastname_id))
+            UPDATE phone SET phon=%s WHERE fk_phone=%s;
+            """, (phones, lastname_id))
         
         conn.commit()
 #Функция, позволяющая изменить данные о клиенте.
@@ -63,51 +63,81 @@ def change_client(conn, client_id, first_name, last_name, email, phones, newname
 def delete_phone(conn, phones):
     with conn.cursor() as cur:
         cur.execute("""
-                 SELECT id FROM phone WHERE phon=%s;
-                 """, (phones,))
+            SELECT id FROM phone WHERE phon=%s;
+            """, (phones,))
         fk_phone = cur.fetchone()
         cur.execute("""
-                DELETE FROM phone WHERE id=%s;
-                """, (fk_phone))
+            DELETE FROM phone WHERE id=%s;
+            """, (fk_phone))
         conn.commit() 
 #Функция, позволяющая удалить телефон для существующего клиента.
 
 def delete_client(conn, last_name):
     with conn.cursor() as cur:
         cur.execute("""
-                 SELECT id FROM username WHERE surname=%s;
-                 """, (last_name,))
+            SELECT id FROM username WHERE surname=%s;
+            """, (last_name,))
         client_id = cur.fetchone()
         cur.execute("""
-                DELETE FROM phone WHERE fk_phone=%s;
-                """, (client_id))
-        
+            DELETE FROM phone WHERE fk_phone=%s;
+            """, (client_id))
         cur.execute("""
-                DELETE FROM username WHERE id=%s;
-                """, (client_id))
+            DELETE FROM username WHERE id=%s;
+            """, (client_id))
         conn.commit() 
 #Функция, позволяющая удалить существующего клиента.
 
-def find_client(conn, first_name, last_name, email, phone):  # поиск пока не победил 
+def find_client(conn, first_name, last_name, email, phone):  
     with conn.cursor() as cur:
         cur.execute("""
             SELECT id FROM username WHERE name=%s;
-                 """, (first_name, ))
+            """, (first_name, ))
         search_name = (cur.fetchone())
+        if search_name is not None:
+            cur.execute("""
+                SELECT name, surname, email FROM username WHERE id=%s;
+                """, (search_name))
+            print (cur.fetchone())
+        else:
+            pass        
+        
         cur.execute("""
             SELECT id FROM username WHERE surname=%s;
-                 """, (last_name, ))
+            """, (last_name, ))
         search_surname = (cur.fetchone())
+        if search_surname is not None:
+            cur.execute("""
+                SELECT name, surname, email FROM username WHERE id=%s;
+                """, (search_surname))
+            print (cur.fetchone())
+        else:
+            pass       
+        
         cur.execute("""
             SELECT id FROM username WHERE email=%s;
-                 """, (email, ))
+            """, (email, ))
         search_email = (cur.fetchone())
+        if search_email is not None:
+            cur.execute("""
+                SELECT name, surname, email FROM username WHERE id=%s;
+                """, (search_email))
+            print (cur.fetchone())
+        else:
+            pass     
+
         cur.execute("""
-            SELECT id FROM phone WHERE phon=%s;
-                 """, (phone, ))
-        search_email = (cur.fetchone())
+            SELECT fk_phone FROM phone WHERE phon=%s;
+            """, (phone, ))
+        search_phone = (cur.fetchone())
+        if search_phone is not None:
+            cur.execute("""
+                SELECT phon FROM phone WHERE fk_phone=%s;
+                """, (search_phone))
+            print (cur.fetchone())
+        else:
+            pass    
     
- #SELECT * FROM username u JOIN phone p ON u.id=fk_phone.id WHERE name=%s or surname=%s or email=%s or phon=%s;      
+
         
 #Функция, позволяющая найти клиента по его данным: имени, фамилии, email или телефону. 
 
